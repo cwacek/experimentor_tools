@@ -148,13 +148,19 @@ def build_node_list(args):
         elif node.get('nodetype') == 'dest':
             nodelist['destinations'].append(mk_struct(node))
         elif (node.get('nodetype') == args.relay_nodetype
-              and node.get('authority') != '1'):
+              and node.get(args.authority_key) != '1'):
             if args.min_relay_bandwidth and float(node.get('bw')) < args.min_relay_bandwidth:
                 continue
             nodelist['relays'].append(mk_struct(node,'bw',(args.exit_key,'exit'),'avg_bw','burst_bw'))
         elif (node.get('nodetype') == args.relay_nodetype
               and node.get(args.authority_key) == '1'):
             nodelist['authorities'].append(mk_struct(node,'bw',(args.exit_key,'exit'),'avg_bw','burst_bw'))
+
+
+    if len(nodelist['relays']) + len(nodelist['authorities']) == 0:
+      sys.stderr.write("Warning: didn't find any relays. Did you "
+                       "provide the correct relay nodetype?\n")
+      sys.exit(1)
 
     return nodelist
 
